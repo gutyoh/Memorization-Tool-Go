@@ -8,7 +8,7 @@ Since this project uses GORM you will need to initialize Go modules. I recommend
 After cloning the repository, the directory tree should look like this:
 
 ```
-Memorization-Tool-Go
+Memorization-Tool-Go # "top-level" directory
 |   course-info.yaml
 |   course-remote-info.yaml
 |   requirements.txt
@@ -78,7 +78,7 @@ Memorization-Tool-Go
                     __init__.cpython-310.pyc
 ```
 
-Then you'll have to `cd` into the "top" _Memorization-Tool-Go_ directory and initialize Go modules:
+Then you'll have to `cd` into the "top-level" _Memorization-Tool-Go_ directory and initialize Go modules:
 
 ```
 go mod init Memorization-Tool-Go
