@@ -1,5 +1,5 @@
 # Memorization-Tool-Go
-HS Memorization Tool project with Go solution using GORM
+[Hyperskill Memorization Tool project](https://hyperskill.org/projects/159) from the Python/Flask track with Go solutions using GORM
 
 # How to run this project with Go solutions
 
