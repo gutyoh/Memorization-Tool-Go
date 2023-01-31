@@ -85,6 +85,10 @@ go mod init Memorization-Tool-Go
 go mod tidy
 ```
 
-After that make sure your Python interpreter has the latest [hs-test-python](https://github.com/hyperskill/hs-test-python/releases/tag/v10) release installed.
+After initializing Go modules, below is a picture of how the project directory should look like including the _go.mod_ and _go.sum_ files:
+
+![image](https://user-images.githubusercontent.com/8846884/215644131-411d7a10-78b6-4ef3-962a-24bb6ba9ef97.png)
+
+The next step is to make sure your Python interpreter has the latest [hs-test-python](https://github.com/hyperskill/hs-test-python/releases/tag/v10) release installed.
 
 Finally, you should be able to `cd` into the _stage1-stage4_ folders and within them run `python tests.py` and confirm that the test pass with Go solutions.
