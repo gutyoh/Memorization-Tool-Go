@@ -3,8 +3,8 @@ package main
 /*
 [Memorization Tool - Stage 3/4: Update the flashcards](https://hyperskill.org/projects/159/stages/828/implement)
 -------------------------------------------------------------------------------
-[CRUD Operations — Update] — TODO
-[CRUD Operations — Delete] — TODO
+[CRUD Operations — Update] — TODO: PENDING TO BE PUBLISHED
+[CRUD Operations — Delete](https://hyperskill.org/learn/step/31914)
 */
 
 import (
@@ -22,6 +22,13 @@ type Flashcard struct {
 	Question string
 	Answer   string
 }
+
+// ⚠️ Tests will also pass with a non-gorm.Model struct! ⚠️
+//type Flashcard struct {
+//	ID       uint `gorm:"primaryKey"`
+//	Question string
+//	Answer   string
+//}
 
 // ====== HELPER FUNCTION =====
 

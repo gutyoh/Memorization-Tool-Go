@@ -23,6 +23,13 @@ type Flashcard struct {
 	Answer   string
 }
 
+// ⚠️ Tests will also pass with a non-gorm.Model struct! ⚠️
+//type Flashcard struct {
+//	ID       uint `gorm:"primaryKey"`
+//	Question string
+//	Answer   string
+//}
+
 // ====== HELPER FUNCTION =====
 
 func isASCII(s string) bool {

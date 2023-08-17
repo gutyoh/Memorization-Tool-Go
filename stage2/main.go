@@ -12,8 +12,8 @@ package main
 [Methods](https://hyperskill.org/learn/topic/1928)
 [Debugging Go code in GoLand](https://hyperskill.org/learn/step/23118)
 [Introduction to GORM](https://hyperskill.org/learn/step/20695)
+[Declaring GORM Models](https://hyperskill.org/learn/step/28639)
 [Migrations](https://hyperskill.org/learn/step/22043)
-[Declaring GORM Models] — TODO
 [CRUD Operations — Create](https://hyperskill.org/learn/step/22859)
 [CRUD Operations — Read](https://hyperskill.org/learn/step/24151)
 */
@@ -29,10 +29,17 @@ import (
 )
 
 type Flashcard struct {
-	ID       uint `gorm:"primaryKey"`
+	gorm.Model
 	Question string
 	Answer   string
 }
+
+// ⚠️ Tests will also pass with a non-gorm.Model struct! ⚠️
+//type Flashcard struct {
+//	ID       uint `gorm:"primaryKey"`
+//	Question string
+//	Answer   string
+//}
 
 // ====== HELPER FUNCTION =====
 

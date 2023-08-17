@@ -1,82 +1,91 @@
 # Memorization-Tool-Go
 [Hyperskill Memorization Tool project](https://hyperskill.org/projects/159) from the Python/Flask track with Go solutions using GORM
 
-# How to run this project with Go solutions
+## Requirements:
 
-Since this project uses GORM you will need to initialize Go modules. I recommend creating a folder with the same name "Memorization-Tool-Go" and then cloning this repository within that folder.
+- Go version 1.21.0
+- Python 3 (for testing)
 
-After cloning the repository, the directory tree should look like this:
+## How to run this project with Go solutions
+
+1. **Clone the Repository and `cd` into it:**
+
+```shell
+git clone https://github.com/gutyoh/Memorization-Tool-Go.git
+cd Memorization-Tool-Go
+```
+
+2. **Directory Structure**: After cloning the repository, the directory tree should look like this:
 
 ```
-Memorization-Tool-Go # "top-level" directory
-|   course-info.yaml
-|   course-remote-info.yaml
-|   requirements.txt
-|
-\---Memorization-Tool-Go
-    |   lesson-info.yaml
-    |   lesson-remote-info.yaml
-    |
-    +---stage1
-    |   |   main.go
-    |   |   task-info.yaml
-    |   |   task-remote-info.yaml
-    |   |   task.html
-    |   |   tests.py
-    |   |
-    |   \---test
-    |       |   tests.py
-    |       |   __init__.py
-    |       |
-    |       \---__pycache__
-    |               tests.cpython-310.pyc
-    |               __init__.cpython-310.pyc
-    |
-    +---stage2
-    |   |   main.go
-    |   |   task-info.yaml
-    |   |   task-remote-info.yaml
-    |   |   task.html
-    |   |   tests.py
-    |   |
-    |   \---test
-    |       |   tests.py
-    |       |   __init__.py
-    |       |
-    |       \---__pycache__
-    |               tests.cpython-310.pyc
-    |               __init__.cpython-310.pyc
-    |
-    +---stage3
-    |   |   main.go
-    |   |   task-info.yaml
-    |   |   task-remote-info.yaml
-    |   |   task.html
-    |   |   tests.py
-    |   |
-    |   \---test
-    |       |   tests.py
-    |       |   __init__.py
-    |       |
-    |       \---__pycache__
-    |               tests.cpython-310.pyc
-    |               __init__.cpython-310.pyc
-    |
-    \---stage4
-        |   main.go
-        |   task-info.yaml
-        |   task-remote-info.yaml
-        |   task.html
-        |   tests.py
-        |
-        \---test
-            |   tests.py
-            |   __init__.py
-            |
-            \---__pycache__
-                    tests.cpython-310.pyc
-                    __init__.cpython-310.pyc
+Memorization-Tool-Go
+├── go.mod
+├── go.sum
+├── lesson-info.yaml
+├── lesson-remote-info.yaml
+├── README.md
+├── requirements.txt
+├── stage1
+│   ├── main.go
+│   ├── task.html
+│   ├── task-info.yaml
+│   ├── task-remote-info.yaml
+│   ├── test
+│   │   ├── __init__.py
+│   │   └── tests.py
+│   └── tests.py
+├── stage2
+│   ├── main.go
+│   ├── task.html
+│   ├── task-info.yaml
+│   ├── task-remote-info.yaml
+│   ├── test
+│   │   ├── __init__.py
+│   │   └── tests.py
+│   └── tests.py
+├── stage3
+│   ├── main.go
+│   ├── task.html
+│   ├── task-info.yaml
+│   ├── task-remote-info.yaml
+│   ├── test
+│   │   ├── __init__.py
+│   │   └── tests.py
+│   └── tests.py
+└── stage4
+    ├── main.go
+    ├── task.html
+    ├── task-info.yaml
+    ├── task-remote-info.yaml
+    ├── test
+    │   ├── __init__.py
+    │   └── tests.py
+    └── tests.py
 ```
+
+3. **Setup Python Virtual Environment:**
+
+**Linux and macOS:**
+
+```shell
+python3 -m venv memo_tool_venv
+source memo_tool_venv/bin/activate
+```
+
+**Windows:**
+
+```bash
+python -m venv memo_tool_venv
+memo_tool_venv\Scripts\activate
+```
+
+
+4. **Install the necessary Python packages:**
+
+```shell
+pip install -r requirements.txt
+```
+
 
 Then you'll have to `cd` into the "top-level" _Memorization-Tool-Go_ directory and initialize Go modules:
 
@@ -85,10 +94,26 @@ go mod init Memorization-Tool-Go
 go mod tidy
 ```
 
-After initializing Go modules, below is a picture of how the project directory should look like including the _go.mod_ and _go.sum_ files:
+After completing the above steps, below is a picture of how the project directory should look like:
 
-![image](https://user-images.githubusercontent.com/8846884/215644131-411d7a10-78b6-4ef3-962a-24bb6ba9ef97.png)
+![image](https://github.com/gutyoh/Memorization-Tool-Go/assets/8846884/82e6afa6-d251-4dd0-91f4-e637dd25a390)
 
-The next step is to make sure your Python interpreter has the latest [hs-test-python](https://github.com/hyperskill/hs-test-python/releases/tag/v10) release installed.
+5. **Run the Python tests:**
 
-Finally, you should be able to `cd` into the _stage1-stage4_ folders and within them run `python tests.py` and confirm that the test pass with Go solutions.
+Finally, you should be able to `cd` into the _stage1-stage4_ folders and within them, run:
+
+**Linux and macOS:**
+
+```shell
+`python3 tests.py`
+```
+
+**Windows:**
+
+```bash
+`python tests.py`
+```
+
+And confirm that the tests pass with Go solutions:
+
+![image](https://github.com/gutyoh/Memorization-Tool-Go/assets/8846884/e0014c2b-3140-4875-aba4-915ad026427a)

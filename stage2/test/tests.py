@@ -119,7 +119,8 @@ class FlashCardTest(StageTest):
 
     def test1_input1(self, out):
         if not os.path.exists("flashcard.db"):
-            raise WrongAnswerException("Please, make sure that your program creates a database and names it \"flashcard\".")
+            raise WrongAnswerException(
+                "Please, make sure that your program creates a database and names it \"flashcard\".")
         if self.check_main_menu(out):
             return '1'
 
