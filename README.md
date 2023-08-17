@@ -105,13 +105,13 @@ Finally, you should be able to `cd` into the _stage1-stage4_ folders and within 
 **Linux and macOS:**
 
 ```shell
-`python3 tests.py`
+python3 tests.py
 ```
 
 **Windows:**
 
 ```bash
-`python tests.py`
+python tests.py
 ```
 
 And confirm that the tests pass with Go solutions:
