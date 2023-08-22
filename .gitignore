@@ -21,4 +21,10 @@ Thumbs.db
 venv/
 *.venv
 .env
-*venv
+*venv/
+
+# Ignore VSCode project settings
+.vscode/
+
+# Ignore the .golangci.yml file
+.golangci.yml

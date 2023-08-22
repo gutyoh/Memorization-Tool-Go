@@ -1,11 +1,5 @@
 package main
 
-/*
-[Memorization Tool - Stage 4/4: The Leitner system](https://hyperskill.org/projects/159/stages/829/implement)
--------------------------------------------------------------------------------
-[Computer algorithms](https://hyperskill.org/learn/step/16547)
-*/
-
 import (
 	"bufio"
 	"fmt"
@@ -17,228 +11,291 @@ import (
 	"gorm.io/gorm"
 )
 
-type Flashcard struct {
-	ID       uint `gorm:"primaryKey"`
-	Question string
-	Answer   string
-}
+// SQLite Database name
+const DatabaseName = "flashcard.db"
 
-// ⚠️ Tests will also pass with a non-gorm.Model struct! ⚠️
-//type Flashcard struct {
-//	ID       uint `gorm:"primaryKey"`
-//	Question string
-//	Answer   string
-//}
+// General prompts and messages
+const (
+	InvalidOptionMsg = "%s is not an option\n"
+	GoodbyeMsg       = "Bye!"
+)
 
-// ====== HELPER FUNCTION =====
+// Flashcard specific prompts and settings
+const (
+	AnswerPrompt          = "Answer:"
+	QuestionPrompt        = "Question:"
+	CurrentQuestionPrompt = "current question:"
+	NewQuestionPrompt     = "please write a new question:"
+	CurrentAnswerPrompt   = "current answer:"
+	NewAnswerPrompt       = "please write a new answer:"
+	NoFlashcardsMsg       = "There is no flashcard to practice!"
+	RequiredCorrectCount  = 3
 
-func isASCII(s string) bool {
-	for _, c := range s {
-		if c > unicode.MaxASCII {
+	PressForAnswer = "press \"y\" to see the answer:"
+	PressToSkip    = "press \"n\" to skip:"
+	PressToUpdate  = "press \"u\" to update:"
+	PressToDelete  = "press \"d\" to delete the flashcard:"
+	PressToEdit    = "press \"e\" to edit the flashcard:"
+	PressCorrect   = "press \"y\" if your answer is correct:"
+	PressWrong     = "press \"n\" if your answer is wrong:"
+)
+
+// Main menu options
+const (
+	MainMenuAddFlashcards      = "1. Add flashcards"
+	MainMenuPracticeFlashcards = "2. Practice flashcards"
+	MainMenuExit               = "3. Exit"
+)
+
+// Flashcard menu options
+const (
+	FlashcardMenuAddNew       = "1. Add a new flashcard"
+	FlashcardMenuReturnToMain = "2. Exit"
+)
+
+func isASCII(str string) bool {
+	for _, char := range str {
+		if char > unicode.MaxASCII {
 			return false
 		}
 	}
 	return true
 }
 
-type MemorizationTool struct {
-	DB         *gorm.DB
-	Flashcards []Flashcard
+func getValidInput(prompt string, scanner *bufio.Scanner) string {
+	fmt.Println(prompt)
+	scanner.Scan()
+	input := scanner.Text()
+	for len(input) == 1 || !isASCII(input) || input == "" {
+		fmt.Println(prompt)
+		scanner.Scan()
+		input = scanner.Text()
+	}
+	return input
+}
 
+type Flashcard struct {
+	gorm.Model
+	Question     string
+	Answer       string
 	CorrectCount int
-
-	MainMenu      [3]string
-	FlashcardMenu [2]string
 }
 
-func (mt *MemorizationTool) DisplayFlashcardMenu() {
-	for _, elem := range mt.FlashcardMenu {
-		fmt.Printf("%s\n", elem)
+//// ⚠️ Tests will also pass with a non-gorm.Model struct! ⚠️
+//type Flashcard struct {
+//	ID           uint `gorm:"primaryKey"`
+//	Question     string
+//	Answer       string
+//	CorrectCount int
+//}
+
+type FlashcardStore struct {
+	DB *gorm.DB
+}
+
+func (fs *FlashcardStore) CreateFlashcard(question, answer string) {
+	fs.DB.Create(&Flashcard{Question: question, Answer: answer})
+}
+
+func (fs *FlashcardStore) RetrieveAllFlashcards() []Flashcard {
+	var flashcards []Flashcard
+	fs.DB.Find(&flashcards)
+	return flashcards
+}
+
+func (fs *FlashcardStore) UpdateFlashcard(fc *Flashcard, newQuestion, newAnswer string) {
+	fc.Question = newQuestion
+	fc.Answer = newAnswer
+	fs.DB.Save(fc)
+}
+
+func (fs *FlashcardStore) DeleteFlashcard(fc *Flashcard) {
+	fs.DB.Delete(fc)
+}
+
+type UserInterface struct {
+	Scanner *bufio.Scanner
+}
+
+func (_ *UserInterface) DisplayMenu(items ...string) {
+	for _, item := range items {
+		fmt.Println(item)
 	}
 }
 
-func (mt *MemorizationTool) DisplayMainMenu() {
-	for _, elem := range mt.MainMenu {
-		fmt.Printf("%s\n", elem)
-	}
+func (ui *UserInterface) DisplayMainMenu() {
+	ui.DisplayMenu(MainMenuAddFlashcards, MainMenuPracticeFlashcards, MainMenuExit)
+}
+
+func (ui *UserInterface) DisplayFlashcardMenu() {
+	ui.DisplayMenu(FlashcardMenuAddNew, FlashcardMenuReturnToMain)
+}
+
+func (ui *UserInterface) DisplayFlashcardQuestion(flashcard *Flashcard) {
+	ui.DisplayMenu(QuestionPrompt+flashcard.Question, PressForAnswer, PressToSkip, PressToUpdate)
+}
+
+func (ui *UserInterface) DisplayFlashcardAnswer(flashcard *Flashcard) {
+	ui.DisplayMenu(AnswerPrompt+flashcard.Answer, PressCorrect, PressWrong)
+}
+
+type MemorizationTool struct {
+	UI    UserInterface
+	Store FlashcardStore
 }
 
 func (mt *MemorizationTool) BuildFlashcard() {
-	var question, answer string
-	scanner := bufio.NewScanner(os.Stdin)
-
-	for len(question) == 1 || !isASCII(question) || question == "" {
-		fmt.Printf("Question:\n")
-		scanner.Scan()
-		question = scanner.Text()
-	}
-
-	for len(answer) == 1 || !isASCII(answer) || answer == "" {
-		fmt.Printf("Answer:\n")
-		scanner.Scan()
-		answer = scanner.Text()
-	}
-
-	mt.DB.Create(&Flashcard{Question: question, Answer: answer})
-
-	var mainMenuChoice string
-	mt.DisplayFlashcardMenu()
-	fmt.Scanln(&mainMenuChoice)
-	mt.FlashcardMenuSelection(mainMenuChoice)
+	question := getValidInput(QuestionPrompt, mt.UI.Scanner)
+	answer := getValidInput(AnswerPrompt, mt.UI.Scanner)
+	mt.Store.CreateFlashcard(question, answer)
 }
 
-func (mt *MemorizationTool) MainMenuSelection(choice string) {
-	var mainMenuChoice string
-	switch choice {
-	case "1":
-		mt.DisplayFlashcardMenu()
-		fmt.Scanln(&mainMenuChoice)
-		mt.FlashcardMenuSelection(mainMenuChoice)
-	case "2":
-		mt.PracticeFlashcards()
-	case "3":
-		fmt.Printf("Bye!\n")
-		os.Exit(0)
-	default:
-		fmt.Printf("%s is not an option\n", choice)
-		mt.DisplayMainMenu()
-		fmt.Scanln(&choice)
-		mt.MainMenuSelection(choice)
+func (mt *MemorizationTool) ProcessCorrectAnswer(flashcard *Flashcard) {
+	flashcard.CorrectCount++
+	if flashcard.CorrectCount == RequiredCorrectCount {
+		mt.Store.DeleteFlashcard(flashcard)
+		flashcard.CorrectCount = 0
+	} else {
+		mt.Store.UpdateFlashcard(flashcard, flashcard.Question, flashcard.Answer)
 	}
 }
 
-func (mt *MemorizationTool) FlashcardMenuSelection(choice string) {
-	switch choice {
-	case "1":
-		mt.BuildFlashcard()
-	case "2":
-		mt.DisplayMainMenu()
-		var mainMenuChoice string
-		fmt.Scanln(&mainMenuChoice)
-		mt.MainMenuSelection(mainMenuChoice)
+func (mt *MemorizationTool) ProcessIncorrectAnswer(flashcard *Flashcard) {
+	flashcard.CorrectCount = 0
+	mt.Store.UpdateFlashcard(flashcard, flashcard.Question, flashcard.Answer)
+}
+
+func (mt *MemorizationTool) ProcessAnswerInput(flashcard *Flashcard) {
+	mt.UI.DisplayFlashcardAnswer(flashcard)
+	var input string
+	fmt.Scanln(&input)
+
+	switch input {
+	case "y":
+		mt.ProcessCorrectAnswer(flashcard)
+	case "n":
+		mt.ProcessIncorrectAnswer(flashcard)
 	default:
-		fmt.Printf("%s is not an option\n", choice)
-		mt.DisplayFlashcardMenu()
-		fmt.Scanln(&choice)
-		mt.FlashcardMenuSelection(choice)
+		fmt.Printf(InvalidOptionMsg, input)
+	}
+}
+
+func (mt *MemorizationTool) UpdateOrDeleteFlashcard(flashcard *Flashcard) {
+	fmt.Println(PressToDelete)
+	fmt.Println(PressToEdit)
+	var input string
+	fmt.Scanln(&input)
+
+	switch input {
+	case "d":
+		mt.Store.DeleteFlashcard(flashcard)
+	case "e":
+		mt.EditFlashcard(flashcard)
+	default:
+		fmt.Printf(InvalidOptionMsg, input)
+	}
+}
+
+func (mt *MemorizationTool) ProcessFlashcard(flashcard *Flashcard) {
+	mt.UI.DisplayFlashcardQuestion(flashcard)
+	var input string
+	fmt.Scanln(&input)
+
+	switch input {
+	case "y":
+		mt.ProcessAnswerInput(flashcard)
+	case "n":
+		return
+	case "u":
+		mt.UpdateOrDeleteFlashcard(flashcard)
+	default:
+		fmt.Printf(InvalidOptionMsg, input)
 	}
 }
 
 func (mt *MemorizationTool) PracticeFlashcards() {
-	mt.DB.Find(&mt.Flashcards)
+	flashcards := mt.Store.RetrieveAllFlashcards()
 
-	if len(mt.Flashcards) == 0 {
-		fmt.Printf("There is no flashcard to practice!\n")
+	if len(flashcards) == 0 {
+		fmt.Println(NoFlashcardsMsg)
+		return
 	}
 
-	if len(mt.Flashcards) > 0 {
-		mt.DisplayPracticeMenu()
+	for _, flashcard := range flashcards {
+		mt.ProcessFlashcard(&flashcard)
 	}
-
-	mt.DisplayMainMenu()
-	var choice string
-	fmt.Scanln(&choice)
-	mt.MainMenuSelection(choice)
 }
 
-func (mt *MemorizationTool) DisplayPracticeMenu() {
-	for _, flashcard := range mt.Flashcards {
-		fmt.Printf("Question: %s\n", flashcard.Question)
-		fmt.Printf("press \"y\" to see the answer:\n")
-		fmt.Printf("press \"n\" to skip:\n")
-		fmt.Printf("press \"u\" to update:\n")
+func (mt *MemorizationTool) EditFlashcard(flashcard *Flashcard) {
+	var newQuestion, newAnswer string
 
-		var input string
-		fmt.Scanln(&input)
+	fmt.Println(CurrentQuestionPrompt, flashcard.Question)
+	fmt.Println(NewQuestionPrompt)
+	newQuestion = getValidInput(QuestionPrompt, mt.UI.Scanner)
 
-		switch input {
-		case "y":
-			fmt.Printf("Answer: %s\n", flashcard.Answer)
-			fmt.Printf("press \"y\" if your answer is correct:\n")
-			fmt.Printf("press \"n\" if your answer is wrong:\n")
+	fmt.Println(CurrentAnswerPrompt, flashcard.Answer)
+	fmt.Println(NewAnswerPrompt)
+	newAnswer = getValidInput(AnswerPrompt, mt.UI.Scanner)
 
-			fmt.Scanln(&input)
+	mt.Store.UpdateFlashcard(flashcard, newQuestion, newAnswer)
+}
 
-			switch input {
-			case "y":
-				mt.CorrectCount += 1
-				if mt.CorrectCount == 3 {
-					mt.DB.Delete(&flashcard)
-					mt.CorrectCount = 0
-				}
-			case "n":
-				continue
-			default:
-				fmt.Printf("%s is not an option\n", input)
-			}
+func (mt *MemorizationTool) FlashcardMenuSelection() {
+	for {
+		mt.UI.DisplayFlashcardMenu()
+		var choice string
+		fmt.Scanln(&choice)
 
-		case "n":
-			continue
-
-		case "u":
-			fmt.Printf("press \"d\" to delete the flashcard:\n")
-			fmt.Printf("press \"e\" to edit the flashcard:\n")
-
-			fmt.Scanln(&input)
-
-			switch input {
-			case "d":
-				mt.DB.Delete(&flashcard)
-
-			case "e":
-				fmt.Printf("current question: %s\n", flashcard.Question)
-				fmt.Printf("please write a new question:\n")
-
-				scanner := bufio.NewScanner(os.Stdin)
-				var newQuestion string
-				for len(newQuestion) == 1 || !isASCII(newQuestion) || newQuestion == "" {
-					scanner.Scan()
-					newQuestion = scanner.Text()
-				}
-				flashcard.Question = newQuestion
-				mt.DB.Save(&flashcard)
-
-				fmt.Printf("current answer: %s\n", flashcard.Answer)
-				fmt.Printf("please write a new answer:\n")
-
-				var newAnswer string
-				for len(newAnswer) == 1 || !isASCII(newAnswer) || newAnswer == "" {
-					scanner.Scan()
-					newAnswer = scanner.Text()
-				}
-				flashcard.Answer = newAnswer
-				mt.DB.Save(&flashcard)
-
-			default:
-				fmt.Printf("%s is not an option\n", input)
-			}
+		switch choice {
+		case "1":
+			mt.BuildFlashcard()
+		case "2":
+			return
 		default:
-			fmt.Printf("%s is not an option\n", input)
+			fmt.Printf(InvalidOptionMsg, choice)
 		}
 	}
 }
 
-func main() {
-	db, err := gorm.Open(sqlite.Open("flashcard.db"), &gorm.Config{})
+func (mt *MemorizationTool) MainMenuSelection() {
+	for {
+		mt.UI.DisplayMainMenu()
+		var choice string
+		fmt.Scanln(&choice)
+
+		switch choice {
+		case "1":
+			mt.FlashcardMenuSelection()
+		case "2":
+			mt.PracticeFlashcards()
+		case "3":
+			fmt.Println(GoodbyeMsg)
+			return
+		default:
+			fmt.Printf(InvalidOptionMsg, choice)
+		}
+	}
+}
+
+func (mt *MemorizationTool) Initialize() {
+	db, err := gorm.Open(sqlite.Open(DatabaseName), &gorm.Config{})
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	var mt = MemorizationTool{
-		MainMenu:      [3]string{"1. Add flashcards", "2. Practice flashcards", "3. Exit"},
-		FlashcardMenu: [2]string{"1. Add a new flashcard", "2. Exit"},
-		DB:            db,
-	}
-
-	if !mt.DB.Migrator().HasTable(&Flashcard{}) {
-		err = mt.DB.Migrator().CreateTable(&Flashcard{})
+	if !db.Migrator().HasTable(&Flashcard{}) {
+		err = db.Migrator().CreateTable(&Flashcard{})
 		if err != nil {
 			log.Fatal(err)
 		}
 	}
 
-	mt.DisplayMainMenu()
-	var choice string
-	fmt.Scanln(&choice)
-	mt.MainMenuSelection(choice)
+	mt.Store = FlashcardStore{DB: db}
+	mt.UI = UserInterface{Scanner: bufio.NewScanner(os.Stdin)}
+}
+
+func main() {
+	var mt MemorizationTool
+	mt.Initialize()
+	mt.MainMenuSelection()
 }

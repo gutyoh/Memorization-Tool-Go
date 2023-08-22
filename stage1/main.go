@@ -14,7 +14,8 @@ package main
 [Maps](https://hyperskill.org/learn/step/16999)
 [Unicode package](https://hyperskill.org/learn/step/23087)
 [Functions](https://hyperskill.org/learn/topic/1750)
-[Public and private scopes](https://hyperskill.org/learn/topic/1894)
+[Single Responsibility Principle](https://hyperskill.org/learn/step/8963)
+[Functional decomposition](https://hyperskill.org/learn/topic/1893)
 */
 
 import (
@@ -24,109 +25,44 @@ import (
 	"unicode"
 )
 
-var Flashcards = make(map[string]string)
-
-func DisplayFlashcardMenu() {
-	var flashcardMenu = [2]string{"1. Add a new flashcard", "2. Exit"}
-	for _, elem := range flashcardMenu {
-		fmt.Println(elem)
-	}
-}
-
-func DisplayMainMenu() {
-	var mainMenu = [3]string{"1. Add flashcards", "2. Practice flashcards", "3. Exit"}
-	for _, elem := range mainMenu {
-		fmt.Println(elem)
-	}
-}
-
-func isASCII(s string) bool {
-	for _, c := range s {
-		if c > unicode.MaxASCII {
+func isASCII(str string) bool {
+	for _, char := range str {
+		if char > unicode.MaxASCII {
 			return false
 		}
 	}
 	return true
 }
 
-func BuildFlashcard() {
+func getValidInput(prompt string, scanner *bufio.Scanner) string {
+	fmt.Println(prompt)
+	scanner.Scan()
+	input := scanner.Text()
+	for len(input) == 1 || !isASCII(input) || input == "" {
+		fmt.Println(prompt)
+		scanner.Scan()
+		input = scanner.Text()
+	}
+	return input
+}
+
+func buildFlashcard(flashcards map[string]string) {
 	var question, answer string
 	scanner := bufio.NewScanner(os.Stdin)
 
-	for len(question) == 1 || !isASCII(question) || question == "" {
-		fmt.Println("Question:")
-		scanner.Scan()
-		question = scanner.Text()
-	}
+	question = getValidInput("Question:", scanner)
+	answer = getValidInput("Answer:", scanner)
 
-	for len(answer) == 1 || !isASCII(answer) || answer == "" {
-		fmt.Println("Answer:")
-		scanner.Scan()
-		answer = scanner.Text()
-	}
-
-	Flashcards[question] = answer
-
-	var mainMenuChoice string
-	DisplayFlashcardMenu()
-	fmt.Scanln(&mainMenuChoice)
-	FlashcardMenuSelection(mainMenuChoice)
+	flashcards[question] = answer
 }
 
-func MainMenuSelection(choice string) {
-	var mainMenuChoice string
-	switch choice {
-	case "1":
-		DisplayFlashcardMenu()
-		fmt.Scanln(&mainMenuChoice)
-		FlashcardMenuSelection(mainMenuChoice)
-	case "2":
-		PracticeFlashcards()
-	case "3":
-		fmt.Println("Bye!")
-		os.Exit(0)
-	default:
-		fmt.Println(choice, "is not an option")
-		DisplayMainMenu()
-		fmt.Scanln(&choice)
-		MainMenuSelection(choice)
-	}
-}
-
-func FlashcardMenuSelection(choice string) {
-	switch choice {
-	case "1":
-		BuildFlashcard()
-	case "2":
-		DisplayMainMenu()
-		var mainMenuChoice string
-		fmt.Scanln(&mainMenuChoice)
-		MainMenuSelection(mainMenuChoice)
-	default:
-		fmt.Println(choice, "is not an option")
-		DisplayFlashcardMenu()
-		fmt.Scanln(&choice)
-		FlashcardMenuSelection(choice)
-	}
-}
-
-func PracticeFlashcards() {
-	if len(Flashcards) == 0 {
+func practiceFlashcards(flashcards map[string]string) {
+	if len(flashcards) == 0 {
 		fmt.Println("There are no flashcards to practice!")
+		return
 	}
 
-	if len(Flashcards) > 0 {
-		DisplayPracticeMenu()
-	}
-
-	DisplayMainMenu()
-	var choice string
-	fmt.Scanln(&choice)
-	MainMenuSelection(choice)
-}
-
-func DisplayPracticeMenu() {
-	for key := range Flashcards {
+	for key := range flashcards {
 		fmt.Println("Question:", key)
 		fmt.Println("Please press \"y\" to see the answer or press \"n\" to skip:")
 		var input string
@@ -134,7 +70,7 @@ func DisplayPracticeMenu() {
 
 		switch input {
 		case "y":
-			fmt.Println("Answer:", Flashcards[key])
+			fmt.Println("Answer:", flashcards[key])
 		case "n":
 			continue
 		default:
@@ -143,9 +79,49 @@ func DisplayPracticeMenu() {
 	}
 }
 
+func addFlashcardsMenu(flashcards map[string]string) {
+	for {
+		fmt.Println("1. Add a new flashcard")
+		fmt.Println("2. Exit")
+
+		var flashcardChoice string
+		fmt.Scanln(&flashcardChoice)
+
+		switch flashcardChoice {
+		case "1":
+			buildFlashcard(flashcards)
+		case "2":
+			return
+		default:
+			fmt.Println(flashcardChoice, "is not an option")
+		}
+	}
+}
+
+func mainMenuSelection(flashcards map[string]string) {
+	for {
+		fmt.Println("1. Add flashcards")
+		fmt.Println("2. Practice flashcards")
+		fmt.Println("3. Exit")
+
+		var choice string
+		fmt.Scanln(&choice)
+
+		switch choice {
+		case "1":
+			addFlashcardsMenu(flashcards)
+		case "2":
+			practiceFlashcards(flashcards)
+		case "3":
+			fmt.Println("Bye!")
+			return
+		default:
+			fmt.Println(choice, "is not an option")
+		}
+	}
+}
+
 func main() {
-	DisplayMainMenu()
-	var choice string
-	fmt.Scanln(&choice)
-	MainMenuSelection(choice)
+	flashcards := make(map[string]string)
+	mainMenuSelection(flashcards)
 }
