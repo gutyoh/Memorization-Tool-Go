@@ -1,7 +1,17 @@
 SHELL := /bin/bash
 STAGES := stage1 stage2 stage3 stage4
 ROOT_DIR := $(shell pwd)
-VENV := $(ROOT_DIR)/memo_tool_venv/bin/python3
+
+# Detect OS
+ifeq ($(OS),Windows_NT)
+    DETECTED_OS := Windows
+    PYTHON := python
+else
+    DETECTED_OS := $(shell uname -s)
+    PYTHON := python3
+endif
+
+VENV := $(ROOT_DIR)/memo_tool_venv/bin/$(PYTHON)
 
 all: venv $(STAGES) finished
 
@@ -27,7 +37,7 @@ finished:
 venv: memo_tool_venv/bin/activate
 
 memo_tool_venv/bin/activate:
-	python3 -m venv memo_tool_venv
+	$(PYTHON) -m venv memo_tool_venv
 	$(VENV) -m pip install -r requirements.txt
 
 clean:

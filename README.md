@@ -11,7 +11,7 @@
 
 1. **Clone the Repository and `cd` into it:**
 
-```shell
+```bash
 git clone https://github.com/gutyoh/Memorization-Tool-Go.git
 cd Memorization-Tool-Go
 ```
@@ -69,7 +69,7 @@ Memorization-Tool-Go
 
 **Linux and macOS:**
 
-```shell
+```bash
 python3 -m venv memo_tool_venv
 source memo_tool_venv/bin/activate
 ```
@@ -83,7 +83,7 @@ memo_tool_venv\Scripts\activate
 
 4. **Install the necessary Python packages:**
 
-```shell
+```bash
 pip install -r requirements.txt
 ```
 
@@ -92,7 +92,7 @@ After completing the above steps, below is a picture of how the project director
 ![image](https://github.com/gutyoh/Memorization-Tool-Go/assets/8846884/5b125647-1ab9-461a-ad78-b3459aadac21)
 
 5. **From the root of the project directory, run the project using `make`:**
-```shell
+```bash
 make
 ```
 
