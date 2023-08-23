@@ -3,10 +3,9 @@ package main
 /*
 [Memorization Tool - Stage 3/4: Update the flashcards](https://hyperskill.org/projects/159/stages/828/implement)
 -------------------------------------------------------------------------------
-[CRUD Operations — Update] — TODO: PENDING TO BE PUBLISHED
+[CRUD Operations — Update](https://hyperskill.org/learn/step/33258)
 [CRUD Operations — Delete](https://hyperskill.org/learn/step/31914)
 */
-
 
 import (
 	"bufio"
@@ -71,7 +70,7 @@ func getValidInput(prompt string, scanner *bufio.Scanner) string {
 	fmt.Println(prompt)
 	scanner.Scan()
 	input := scanner.Text()
-	for len(input) == 1 || !isASCII(input) || input == "" {
+	for len(input) <= 1 || !isASCII(input) {
 		fmt.Println(prompt)
 		scanner.Scan()
 		input = scanner.Text()
@@ -85,7 +84,7 @@ type Flashcard struct {
 	Answer   string
 }
 
-//// ⚠️ Tests will also pass with a non-gorm.Model struct! ⚠️
+//// 🚨 Attention 🚨: Tests will also work if students want to use a non-gorm.Model struct! ✅
 //type Flashcard struct {
 //	ID       uint `gorm:"primaryKey"`
 //	Question string
@@ -143,12 +142,16 @@ type MemorizationTool struct {
 	Store FlashcardStore
 }
 
+func NewMemorizationTool(db *gorm.DB, scanner *bufio.Scanner) *MemorizationTool {
+	return &MemorizationTool{
+		Store: FlashcardStore{DB: db},
+		UI:    UserInterface{Scanner: scanner},
+	}
+}
+
 func (mt *MemorizationTool) BuildFlashcard() {
-	var question, answer string
-
-	question = getValidInput(QuestionPrompt, mt.UI.Scanner)
-	answer = getValidInput(AnswerPrompt, mt.UI.Scanner)
-
+	question := getValidInput(QuestionPrompt, mt.UI.Scanner)
+	answer := getValidInput(AnswerPrompt, mt.UI.Scanner)
 	mt.Store.CreateFlashcard(question, answer)
 }
 
@@ -199,15 +202,13 @@ func (mt *MemorizationTool) PracticeFlashcards() {
 }
 
 func (mt *MemorizationTool) EditFlashcard(flashcard *Flashcard) {
-	var newQuestion, newAnswer string
-
 	fmt.Println(CurrentQuestionPrompt, flashcard.Question)
 	fmt.Println(NewQuestionPrompt)
-	newQuestion = getValidInput(QuestionPrompt, mt.UI.Scanner)
+	newQuestion := getValidInput(QuestionPrompt, mt.UI.Scanner)
 
 	fmt.Println(CurrentAnswerPrompt, flashcard.Answer)
 	fmt.Println(NewAnswerPrompt)
-	newAnswer = getValidInput(AnswerPrompt, mt.UI.Scanner)
+	newAnswer := getValidInput(AnswerPrompt, mt.UI.Scanner)
 
 	mt.Store.UpdateFlashcard(flashcard, newQuestion, newAnswer)
 }
@@ -249,25 +250,30 @@ func (mt *MemorizationTool) MainMenuSelection() {
 	}
 }
 
-func (mt *MemorizationTool) Initialize() {
+func (mt *MemorizationTool) Initialize() error {
 	db, err := gorm.Open(sqlite.Open(DatabaseName), &gorm.Config{})
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("failed to open %s: %w", DatabaseName, err)
 	}
 
 	if !db.Migrator().HasTable(&Flashcard{}) {
 		err = db.Migrator().CreateTable(&Flashcard{})
 		if err != nil {
-			log.Fatal(err)
+			return fmt.Errorf("failed to create flashcards table: %w", err)
 		}
 	}
 
-	mt.Store = FlashcardStore{DB: db}
-	mt.UI = UserInterface{Scanner: bufio.NewScanner(os.Stdin)}
+	scanner := bufio.NewScanner(os.Stdin)
+	*mt = *NewMemorizationTool(db, scanner)
+	return nil
 }
 
 func main() {
 	var mt MemorizationTool
-	mt.Initialize()
+	err := mt.Initialize()
+	if err != nil {
+		log.Fatalf("failed to initialize the application: %v", err)
+	}
+
 	mt.MainMenuSelection()
 }

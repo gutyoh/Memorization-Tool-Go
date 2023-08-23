@@ -5,15 +5,17 @@ package main
 -------------------------------------------------------------------------------
 [Primitive types](https://hyperskill.org/learn/topic/1807)
 [Input/Output](https://hyperskill.org/learn/topic/1506)
-[Slices](https://hyperskill.org/learn/topic/1672)
 [Control statements](https://hyperskill.org/learn/topic/1728)
 [Loops](https://hyperskill.org/learn/topic/1531)
 [Advanced Input](https://hyperskill.org/learn/topic/2027)
-[Errors](https://hyperskill.org/learn/topic/1795)
 [Debugging Go code](https://hyperskill.org/learn/step/23076)
 [Maps](https://hyperskill.org/learn/step/16999)
 [Unicode package](https://hyperskill.org/learn/step/23087)
 [Functions](https://hyperskill.org/learn/topic/1750)
+
+[Intro to computational thinking](https://hyperskill.org/learn/step/8742)
+[Components of computational thinking](https://hyperskill.org/learn/step/8745)
+[Design principles](https://hyperskill.org/learn/step/8956)
 [Single Responsibility Principle](https://hyperskill.org/learn/step/8963)
 [Functional decomposition](https://hyperskill.org/learn/topic/1893)
 */
@@ -38,7 +40,7 @@ func getValidInput(prompt string, scanner *bufio.Scanner) string {
 	fmt.Println(prompt)
 	scanner.Scan()
 	input := scanner.Text()
-	for len(input) == 1 || !isASCII(input) || input == "" {
+	for len(input) <= 1 || !isASCII(input) {
 		fmt.Println(prompt)
 		scanner.Scan()
 		input = scanner.Text()

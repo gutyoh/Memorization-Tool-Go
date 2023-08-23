@@ -1,10 +1,11 @@
 # Memorization-Tool-Go
-[Hyperskill Memorization Tool project](https://hyperskill.org/projects/159) from the Python/Flask track with Go solutions using GORM
+[Hyperskill Memorization Tool project](https://hyperskill.org/projects/159) from the Python/Flask track, reimplemented in Go using GORM.
 
 ## Requirements:
 
 - Go version 1.21.0
 - Python 3 (for testing)
+- Make (for automation)
 
 ## How to run this project with Go solutions
 
@@ -23,6 +24,7 @@ Memorization-Tool-Go
 ├── go.sum
 ├── lesson-info.yaml
 ├── lesson-remote-info.yaml
+├── Makefile
 ├── README.md
 ├── requirements.txt
 ├── stage1
@@ -79,12 +81,20 @@ python -m venv memo_tool_venv
 memo_tool_venv\Scripts\activate
 ```
 
-
 4. **Install the necessary Python packages:**
 
 ```shell
 pip install -r requirements.txt
 ```
+
+5. **From the root of the project directory, run the project using `make`:**
+```shell
+make
+```
+
+Executing the `make` command will automatically run tests for each stage (_stage1_ to _stage4_).
+
+
 
 
 Then you'll have to `cd` into the "top-level" _Memorization-Tool-Go_ directory and initialize Go modules:
@@ -114,6 +124,6 @@ python3 tests.py
 python tests.py
 ```
 
-And confirm that the tests pass with Go solutions:
+Finally, confirm that the tests pass with Go solutions:
 
 ![image](https://github.com/gutyoh/Memorization-Tool-Go/assets/8846884/e0014c2b-3140-4875-aba4-915ad026427a)

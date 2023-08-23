@@ -3,10 +3,8 @@ package main
 /*
 [Memorization Tool - Stage 2/4: Store the flashcards](https://hyperskill.org/projects/159/stages/827/implement)
 -------------------------------------------------------------------------------
-[Intro to computational thinking](https://hyperskill.org/learn/step/8742)
-[Components of computational thinking](https://hyperskill.org/learn/step/8745)
-[Design principles](https://hyperskill.org/learn/step/8956)
-[Single Responsibility Principle](https://hyperskill.org/learn/step/8963)
+[Slices](https://hyperskill.org/learn/topic/1672)
+[Errors](https://hyperskill.org/learn/topic/1795)
 [Variadic functions](https://hyperskill.org/learn/step/21798)
 [Structs](https://hyperskill.org/learn/topic/1891)
 [Methods](https://hyperskill.org/learn/topic/1928)
@@ -16,6 +14,11 @@ package main
 [Migrations](https://hyperskill.org/learn/step/22043)
 [CRUD Operations — Create](https://hyperskill.org/learn/step/22859)
 [CRUD Operations — Read](https://hyperskill.org/learn/step/24151)
+
+[Introduction to OOP](https://hyperskill.org/learn/step/3614)
+[Encapsulation](https://hyperskill.org/learn/step/8519)
+[Dependency injection](https://hyperskill.org/learn/step/20580)
+[Factory Method and Prototype](https://hyperskill.org/learn/step/16430)
 */
 
 import (
@@ -48,7 +51,6 @@ const (
 
 	PressForAnswer = "press \"y\" to see the answer:"
 	PressToSkip    = "press \"n\" to skip:"
-	PressToUpdate  = "press \"u\" to update:"
 )
 
 // Main menu options
@@ -77,7 +79,7 @@ func getValidInput(prompt string, scanner *bufio.Scanner) string {
 	fmt.Println(prompt)
 	scanner.Scan()
 	input := scanner.Text()
-	for len(input) == 1 || !isASCII(input) || input == "" {
+	for len(input) <= 1 || !isASCII(input) {
 		fmt.Println(prompt)
 		scanner.Scan()
 		input = scanner.Text()
@@ -91,7 +93,7 @@ type Flashcard struct {
 	Answer   string
 }
 
-//// ⚠️ Tests will also pass with a non-gorm.Model struct! ⚠️
+//// 🚨 Attention 🚨: Tests will also work if students want to use a non-gorm.Model struct! ✅
 //type Flashcard struct {
 //	ID       uint `gorm:"primaryKey"`
 //	Question string
@@ -131,7 +133,7 @@ func (ui *UserInterface) DisplayFlashcardMenu() {
 }
 
 func (ui *UserInterface) DisplayFlashcardQuestion(flashcard *Flashcard) {
-	ui.DisplayMenu(QuestionPrompt+flashcard.Question, PressForAnswer, PressToSkip, PressToUpdate)
+	ui.DisplayMenu(QuestionPrompt+flashcard.Question, PressForAnswer, PressToSkip)
 }
 
 type MemorizationTool struct {
@@ -139,14 +141,16 @@ type MemorizationTool struct {
 	Store FlashcardStore
 }
 
+func NewMemorizationTool(db *gorm.DB, scanner *bufio.Scanner) *MemorizationTool {
+	return &MemorizationTool{
+		Store: FlashcardStore{DB: db},
+		UI:    UserInterface{Scanner: scanner},
+	}
+}
+
 func (mt *MemorizationTool) BuildFlashcard() {
-	scanner := bufio.NewScanner(os.Stdin)
-	var question, answer string
-
-	question = getValidInput(QuestionPrompt, scanner)
-
-	answer = getValidInput(AnswerPrompt, scanner)
-
+	question := getValidInput(QuestionPrompt, mt.UI.Scanner)
+	answer := getValidInput(AnswerPrompt, mt.UI.Scanner)
 	mt.Store.CreateFlashcard(question, answer)
 }
 
@@ -214,25 +218,30 @@ func (mt *MemorizationTool) MainMenuSelection() {
 	}
 }
 
-func (mt *MemorizationTool) Initialize() {
+func (mt *MemorizationTool) Initialize() error {
 	db, err := gorm.Open(sqlite.Open(DatabaseName), &gorm.Config{})
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("failed to open %s: %w", DatabaseName, err)
 	}
 
 	if !db.Migrator().HasTable(&Flashcard{}) {
 		err = db.Migrator().CreateTable(&Flashcard{})
 		if err != nil {
-			log.Fatal(err)
+			return fmt.Errorf("failed to create flashcards table: %w", err)
 		}
 	}
 
-	mt.Store = FlashcardStore{DB: db}
-	mt.UI = UserInterface{Scanner: bufio.NewScanner(os.Stdin)}
+	scanner := bufio.NewScanner(os.Stdin)
+	*mt = *NewMemorizationTool(db, scanner)
+	return nil
 }
 
 func main() {
 	var mt MemorizationTool
-	mt.Initialize()
+	err := mt.Initialize()
+	if err != nil {
+		log.Fatalf("failed to initialize the application: %v", err)
+	}
+
 	mt.MainMenuSelection()
 }
