@@ -10,7 +10,7 @@ Before you get started with the Memorization Tool project, ensure you have the f
 - Make (for automation)
 
 > **For Windows 🪟 Users**:  
-> While you can run individual tests in Windows directly, for a full automated testing experience with make, it's highly recommended to use the Windows Subsystem for Linux (WSL). Follow this guide to set up WSL.
+> While you can run individual tests in Windows directly, for a full automated testing experience with make, it's highly recommended to use the Windows Subsystem for Linux (WSL). Follow [this guide](https://docs.microsoft.com/en-us/windows/wsl/install) to set up WSL.
 
 
 ## Setting up the project workspace:
