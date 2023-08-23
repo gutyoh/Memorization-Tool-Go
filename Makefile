@@ -1,16 +1,7 @@
 SHELL := /bin/bash
 STAGES := stage1 stage2 stage3 stage4
 ROOT_DIR := $(shell pwd)
-
-# Detect OS
-ifeq ($(OS),Windows_NT)
-    DETECTED_OS := Windows
-    PYTHON := python
-else
-    DETECTED_OS := $(shell uname -s)
-    PYTHON := python3
-endif
-
+PYTHON := python3
 VENV := $(ROOT_DIR)/memo_tool_venv/bin/$(PYTHON)
 
 all: venv $(STAGES) finished

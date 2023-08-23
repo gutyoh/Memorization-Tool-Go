@@ -9,15 +9,11 @@ Before you get started with the Memorization Tool project, ensure you have the f
 - Python 3 (for testing)
 - Make (for automation)
 
-If you're using **Windows 🪟**, you'll also need:
-
-- [Git Bash](https://gitforwindows.org/)
-- The [Make binary for Windows](http://gnuwin32.sourceforge.net/packages/make.htm)
-
-Having these tools installed will ensure a smooth development and testing experience across different platforms.
+> **For Windows 🪟 Users**:  
+> While you can run individual tests in Windows directly, for a full automated testing experience with make, it's highly recommended to use the Windows Subsystem for Linux (WSL). Follow this guide to set up WSL.
 
 
-## How to run this project with Go solutions
+## Setting up the project workspace:
 
 1. **Clone the repository and `cd` into it:**
 
@@ -77,7 +73,7 @@ Memorization-Tool-Go
 
 3. **Setup Python Virtual Environment:**
 
-**Linux 🐧 and macOS 🍏:**
+**Linux 🐧, macOS 🍏, and WSL:**
 
 ```bash
 python3 -m venv memo_tool_venv
@@ -101,12 +97,30 @@ After completing the above steps, below is a picture of how the project director
 
 ![image](https://github.com/gutyoh/Memorization-Tool-Go/assets/8846884/5b125647-1ab9-461a-ad78-b3459aadac21)
 
-5. **From the root of the project directory, run the project using `make`:**
+---
+
+## Running the project:
+
+**Linux 🐧, macOS 🍏, and WSL:**
+
+From the root of the project directory, run the project using `make`:
 ```bash
 make
 ```
 
 Executing the `make` command will automatically run tests for each stage (_stage1_ to _stage4_).
+
+
+**Windows 🪟:**
+
+For Windows users not using WSL, you'll need to manually navigate into each stage and run the tests:
+
+```bash
+cd stage1
+python tests.py
+```
+
+---
 
 Finally, confirm that the tests pass with Go solutions:
 
