@@ -1,5 +1,11 @@
 package main
 
+/*
+[Memorization Tool - Stage 4/4: The Leitner system](https://hyperskill.org/projects/159/stages/829/implement)
+-------------------------------------------------------------------------------
+[Computer algorithms](https://hyperskill.org/learn/step/16547)
+*/
+
 import (
 	"bufio"
 	"fmt"

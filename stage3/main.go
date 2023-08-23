@@ -1,5 +1,13 @@
 package main
 
+/*
+[Memorization Tool - Stage 3/4: Update the flashcards](https://hyperskill.org/projects/159/stages/828/implement)
+-------------------------------------------------------------------------------
+[CRUD Operations — Update] — TODO: PENDING TO BE PUBLISHED
+[CRUD Operations — Delete](https://hyperskill.org/learn/step/31914)
+*/
+
+
 import (
 	"bufio"
 	"fmt"

@@ -1,5 +1,23 @@
 package main
 
+/*
+[Memorization Tool - Stage 2/4: Store the flashcards](https://hyperskill.org/projects/159/stages/827/implement)
+-------------------------------------------------------------------------------
+[Intro to computational thinking](https://hyperskill.org/learn/step/8742)
+[Components of computational thinking](https://hyperskill.org/learn/step/8745)
+[Design principles](https://hyperskill.org/learn/step/8956)
+[Single Responsibility Principle](https://hyperskill.org/learn/step/8963)
+[Variadic functions](https://hyperskill.org/learn/step/21798)
+[Structs](https://hyperskill.org/learn/topic/1891)
+[Methods](https://hyperskill.org/learn/topic/1928)
+[Debugging Go code in GoLand](https://hyperskill.org/learn/step/23118)
+[Introduction to GORM](https://hyperskill.org/learn/step/20695)
+[Declaring GORM Models](https://hyperskill.org/learn/step/28639)
+[Migrations](https://hyperskill.org/learn/step/22043)
+[CRUD Operations — Create](https://hyperskill.org/learn/step/22859)
+[CRUD Operations — Read](https://hyperskill.org/learn/step/24151)
+*/
+
 import (
 	"bufio"
 	"fmt"
