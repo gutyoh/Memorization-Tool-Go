@@ -3,20 +3,30 @@
 
 ## Requirements:
 
+Before you get started with the Memorization Tool project, ensure you have the following requirements installed in your machine:
+
 - Go version 1.21.0
 - Python 3 (for testing)
 - Make (for automation)
 
+If you're using **Windows 🪟**, you'll also need:
+
+- [Git Bash](https://gitforwindows.org/)
+- The [Make binary for Windows](http://gnuwin32.sourceforge.net/packages/make.htm)
+
+Having these tools installed will ensure a smooth development and testing experience across different platforms.
+
+
 ## How to run this project with Go solutions
 
-1. **Clone the Repository and `cd` into it:**
+1. **Clone the repository and `cd` into it:**
 
 ```bash
 git clone https://github.com/gutyoh/Memorization-Tool-Go.git
 cd Memorization-Tool-Go
 ```
 
-2. **Directory Structure**: After cloning the repository, the directory tree should look like this:
+2. **Directory structure**: After cloning the repository, the directory tree should look like this:
 
 ```
 Memorization-Tool-Go
@@ -67,14 +77,14 @@ Memorization-Tool-Go
 
 3. **Setup Python Virtual Environment:**
 
-**Linux and macOS:**
+**Linux 🐧 and macOS 🍏:**
 
 ```bash
 python3 -m venv memo_tool_venv
 source memo_tool_venv/bin/activate
 ```
 
-**Windows:**
+**Windows 🪟:**
 
 ```bash
 python -m venv memo_tool_venv
