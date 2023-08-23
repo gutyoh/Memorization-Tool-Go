@@ -87,6 +87,10 @@ memo_tool_venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
+After completing the above steps, below is a picture of how the project directory should look like:
+
+![image](https://github.com/gutyoh/Memorization-Tool-Go/assets/8846884/5b125647-1ab9-461a-ad78-b3459aadac21)
+
 5. **From the root of the project directory, run the project using `make`:**
 ```shell
 make
@@ -94,36 +98,6 @@ make
 
 Executing the `make` command will automatically run tests for each stage (_stage1_ to _stage4_).
 
-
-
-
-Then you'll have to `cd` into the "top-level" _Memorization-Tool-Go_ directory and initialize Go modules:
-
-```
-go mod init Memorization-Tool-Go
-go mod tidy
-```
-
-After completing the above steps, below is a picture of how the project directory should look like:
-
-![image](https://github.com/gutyoh/Memorization-Tool-Go/assets/8846884/82e6afa6-d251-4dd0-91f4-e637dd25a390)
-
-5. **Run the Python tests:**
-
-Finally, you should be able to `cd` into the _stage1-stage4_ folders and within them, run:
-
-**Linux and macOS:**
-
-```shell
-python3 tests.py
-```
-
-**Windows:**
-
-```bash
-python tests.py
-```
-
 Finally, confirm that the tests pass with Go solutions:
 
-![image](https://github.com/gutyoh/Memorization-Tool-Go/assets/8846884/e0014c2b-3140-4875-aba4-915ad026427a)
+![image](https://github.com/gutyoh/Memorization-Tool-Go/assets/8846884/32ca8b7c-3478-4490-8eed-50b7c71756ab)
