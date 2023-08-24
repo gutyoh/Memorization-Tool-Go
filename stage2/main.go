@@ -118,7 +118,7 @@ type UserInterface struct {
 	Scanner *bufio.Scanner
 }
 
-func (_ *UserInterface) DisplayMenu(items ...string) {
+func (*UserInterface) DisplayMenu(items ...string) {
 	for _, item := range items {
 		fmt.Println(item)
 	}
@@ -141,11 +141,18 @@ type MemorizationTool struct {
 	Store FlashcardStore
 }
 
-func NewMemorizationTool(db *gorm.DB, scanner *bufio.Scanner) *MemorizationTool {
+func NewMemorizationTool(db *gorm.DB) (*MemorizationTool, error) {
+	if !db.Migrator().HasTable(&Flashcard{}) {
+		err := db.Migrator().CreateTable(&Flashcard{})
+		if err != nil {
+			return nil, fmt.Errorf("failed to create flashcards table: %w", err)
+		}
+	}
+	scanner := bufio.NewScanner(os.Stdin)
 	return &MemorizationTool{
 		Store: FlashcardStore{DB: db},
 		UI:    UserInterface{Scanner: scanner},
-	}
+	}, nil
 }
 
 func (mt *MemorizationTool) BuildFlashcard() {
@@ -218,27 +225,13 @@ func (mt *MemorizationTool) MainMenuSelection() {
 	}
 }
 
-func (mt *MemorizationTool) Initialize() error {
+func main() {
 	db, err := gorm.Open(sqlite.Open(DatabaseName), &gorm.Config{})
 	if err != nil {
-		return fmt.Errorf("failed to open %s: %w", DatabaseName, err)
+		log.Fatalf("failed to open %s: %v", DatabaseName, err)
 	}
 
-	if !db.Migrator().HasTable(&Flashcard{}) {
-		err = db.Migrator().CreateTable(&Flashcard{})
-		if err != nil {
-			return fmt.Errorf("failed to create flashcards table: %w", err)
-		}
-	}
-
-	scanner := bufio.NewScanner(os.Stdin)
-	*mt = *NewMemorizationTool(db, scanner)
-	return nil
-}
-
-func main() {
-	var mt MemorizationTool
-	err := mt.Initialize()
+	mt, err := NewMemorizationTool(db)
 	if err != nil {
 		log.Fatalf("failed to initialize the application: %v", err)
 	}

@@ -105,9 +105,7 @@ func (fs *FlashcardStore) RetrieveAllFlashcards() []Flashcard {
 	return flashcards
 }
 
-func (fs *FlashcardStore) UpdateFlashcard(fc *Flashcard, newQuestion, newAnswer string) {
-	fc.Question = newQuestion
-	fc.Answer = newAnswer
+func (fs *FlashcardStore) UpdateFlashcard(fc *Flashcard) {
 	fs.DB.Save(fc)
 }
 
@@ -119,7 +117,7 @@ type UserInterface struct {
 	Scanner *bufio.Scanner
 }
 
-func (_ *UserInterface) DisplayMenu(items ...string) {
+func (*UserInterface) DisplayMenu(items ...string) {
 	for _, item := range items {
 		fmt.Println(item)
 	}
@@ -142,11 +140,18 @@ type MemorizationTool struct {
 	Store FlashcardStore
 }
 
-func NewMemorizationTool(db *gorm.DB, scanner *bufio.Scanner) *MemorizationTool {
+func NewMemorizationTool(db *gorm.DB) (*MemorizationTool, error) {
+	if !db.Migrator().HasTable(&Flashcard{}) {
+		err := db.Migrator().CreateTable(&Flashcard{})
+		if err != nil {
+			return nil, fmt.Errorf("failed to create flashcards table: %w", err)
+		}
+	}
+	scanner := bufio.NewScanner(os.Stdin)
 	return &MemorizationTool{
 		Store: FlashcardStore{DB: db},
 		UI:    UserInterface{Scanner: scanner},
-	}
+	}, nil
 }
 
 func (mt *MemorizationTool) BuildFlashcard() {
@@ -166,6 +171,7 @@ func (mt *MemorizationTool) UpdateOrDeleteFlashcard(flashcard *Flashcard) {
 		mt.Store.DeleteFlashcard(flashcard)
 	case "e":
 		mt.EditFlashcard(flashcard)
+		mt.Store.UpdateFlashcard(flashcard)
 	default:
 		fmt.Printf(InvalidOptionMsg, input)
 	}
@@ -205,12 +211,12 @@ func (mt *MemorizationTool) EditFlashcard(flashcard *Flashcard) {
 	fmt.Println(CurrentQuestionPrompt, flashcard.Question)
 	fmt.Println(NewQuestionPrompt)
 	newQuestion := getValidInput(QuestionPrompt, mt.UI.Scanner)
+	flashcard.Question = newQuestion
 
 	fmt.Println(CurrentAnswerPrompt, flashcard.Answer)
 	fmt.Println(NewAnswerPrompt)
 	newAnswer := getValidInput(AnswerPrompt, mt.UI.Scanner)
-
-	mt.Store.UpdateFlashcard(flashcard, newQuestion, newAnswer)
+	flashcard.Answer = newAnswer
 }
 
 func (mt *MemorizationTool) FlashcardMenuSelection() {
@@ -250,27 +256,13 @@ func (mt *MemorizationTool) MainMenuSelection() {
 	}
 }
 
-func (mt *MemorizationTool) Initialize() error {
+func main() {
 	db, err := gorm.Open(sqlite.Open(DatabaseName), &gorm.Config{})
 	if err != nil {
-		return fmt.Errorf("failed to open %s: %w", DatabaseName, err)
+		log.Fatalf("failed to open %s: %v", DatabaseName, err)
 	}
 
-	if !db.Migrator().HasTable(&Flashcard{}) {
-		err = db.Migrator().CreateTable(&Flashcard{})
-		if err != nil {
-			return fmt.Errorf("failed to create flashcards table: %w", err)
-		}
-	}
-
-	scanner := bufio.NewScanner(os.Stdin)
-	*mt = *NewMemorizationTool(db, scanner)
-	return nil
-}
-
-func main() {
-	var mt MemorizationTool
-	err := mt.Initialize()
+	mt, err := NewMemorizationTool(db)
 	if err != nil {
 		log.Fatalf("failed to initialize the application: %v", err)
 	}
