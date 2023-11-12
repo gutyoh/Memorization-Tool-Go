@@ -5,8 +5,8 @@
 
 Before you get started with the Memorization Tool project, ensure you have the following requirements installed in your machine:
 
-- Go version 1.21.0
-- Python 3 (for testing)
+- Go version 1.21.0+
+- Python 3.10+ (for testing)
 - Make (for automation)
 
 > **For Windows 🪟 Users**:  

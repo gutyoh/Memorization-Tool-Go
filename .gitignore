@@ -29,5 +29,18 @@ venv/
 # Ignore the .golangci.yml file
 .golangci.yml
 
-# Ignore the flashcard.db file
-flashcard.db
+# Ignore any Go binaries
+*.exe
+*.exe~
+
+# Ignore the SQLite database file:
+*.sqlite3
+*.s3db
+*.db
+
+# Ignore Gradle build files and temporary files
+**/build/
+**/tmp/
+
+# Ignore the .gradle cache directory
+.gradle/
